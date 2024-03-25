@@ -17,3 +17,6 @@ The Creator Marketplace is the easiest way to install Blueprint. You'll get acce
 - From the Studio TopBar go to "Plugins" -> "Blueprint" Toolbar -> "Set" Button
 - All Done!
 ```
+<p>
+  <a href=""><img src="images/Usage.gif" alt="Example"></a>
+</p>
