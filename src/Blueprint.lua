@@ -1,7 +1,7 @@
 --!strict
 --[[
 	License: Licensed under the MIT License
-	Version: 1.0.0
+	Version: 1.0.1
 	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
@@ -33,7 +33,7 @@ local function ReplaceBlueprintSource()
 	end
 	
 	local Script = Selected[1] :: Script
-	if not Script then 
+	if not Script or (not Script:IsA("Script") and not Script:IsA("ModuleScript") and not Script:IsA("LocalScript")) then 
 		error(`Blueprint: Select a "Script" as source input`)
 	end
 	
