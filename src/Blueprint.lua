@@ -2,6 +2,7 @@
 --[[
 	License: Licensed under the MIT License
 	Version: 1.0.0
+	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
 
