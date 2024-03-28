@@ -1,7 +1,6 @@
---!strict
 --[[
 	License: Licensed under the MIT License
-	Version: 1.0.1
+	Version: 1.0.2
 	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
@@ -13,6 +12,7 @@
 	Select a "Script" Instance in the Roblox Studio "Explorer" with the desired source template -> go to "Plugins" Page from the TopBar -> Blueprint -> "Set" Button -> Done!
 	
 --]]
+--!strict
 
 ----- Loaded Services -----
 local Selection = game:GetService("Selection")
@@ -34,16 +34,16 @@ local function ReplaceBlueprintSource()
 	
 	local Script = Selected[1] :: Script
 	if not Script or (not Script:IsA("Script") and not Script:IsA("ModuleScript") and not Script:IsA("LocalScript")) then 
-		error(`Blueprint: Select a "Script" as source input`)
+		error(`Blueprint: Select a "Script" object as source input`)
 	end
 	
 	local ScriptSource = Script.Source
 	if not ScriptSource then
-		error(`Blueprint: Invalid Script Source`)
+		error(`Blueprint: Invalid script source`)
 	end
 	
-	plugin:SetSetting("BlueprintSource", ScriptSource)
-	print("Blueprint: Successfully set blueprint source as ->", {ScriptSource})
+	plugin:SetSetting(`{Script.ClassName}-BlueprintSource`, ScriptSource)
+	print(`Blueprint: Successfully set {Script.ClassName} blueprint source as ->`, {ScriptSource})
 end
 
 local function IsNewScript(Script: Script, Source: string): boolean
@@ -67,7 +67,7 @@ ScriptEditorService.TextDocumentDidOpen:Connect(function(ScriptDocument)
 
 	if not IsNewScript(Script, Script.Source) then return end
 
-	local BlueprintSource = plugin:GetSetting("BlueprintSource")
+	local BlueprintSource = plugin:GetSetting(`{Script.ClassName}-BlueprintSource`)
 	if not BlueprintSource then return end
 
 	ScriptEditorService:UpdateSourceAsync(Script, function()
@@ -75,7 +75,7 @@ ScriptEditorService.TextDocumentDidOpen:Connect(function(ScriptDocument)
 	end)
 
 	if Blueprint_Debug then
-		print(`Blueprint Debug: Successfully replaced {Script:GetFullName()} with a blueprint`)
+		print(`Blueprint Debug: Successfully replaced {Script:GetFullName()} with a {Script.ClassName} blueprint`)
 	end
 end)
 
