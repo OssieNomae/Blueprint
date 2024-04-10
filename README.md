@@ -1,5 +1,5 @@
 <div align="center">
-<h1 align="center">Blueprint</h3>
+<h1 align="center">Blueprint</h1>
   <p align="center">
     a Roblox Studio plugin designed to replace the default script sources with a dedicated template seamlessly
   </p>
