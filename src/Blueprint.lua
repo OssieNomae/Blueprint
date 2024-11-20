@@ -1,6 +1,7 @@
+--!strict
 --[[
 	License: Licensed under the MIT License
-	Version: 1.1.0
+	Version: 1.2.0
 	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
@@ -9,52 +10,69 @@
 	
 	--------------------------------
 	
-	Select a "Script" Instance in the Roblox Studio "Explorer" with the desired source template -> go to "Plugins" Page from the TopBar -> Blueprint -> "Set" Button -> Done!
+	Modify the desired script source template -> go to "Plugins" Page from the TopBar -> Blueprint -> "Open Blueprint" Button -> Select Script Type from the dropdown menu -> Modify the created blueprint script -> Close the blueprint script tab to save!
 	
 --]]
---!strict
+
+----- Module / Class / Object Table -----------
+local DEFAULT_SCRIPT_SOURCE = 'print("Hello world!")\n'
+local DEFAULT_MODULE_SOURCE = 'local module = {}\n\nreturn module\n'
 
 ----- Loaded Services -----
 local Selection = game:GetService("Selection")
 local ScriptEditorService = game:GetService("ScriptEditorService")
 
+----- Types -----
+type ScriptType = "Script" | "LocalScript" | "ModuleScript"
+
 ----- Private Variables -----
 local Toolbar = plugin:CreateToolbar("Blueprint") :: PluginToolbar
-local SetBlueprint = Toolbar:CreateButton("Blueprint Set", "Select a Script and Press to Set as a Blueprint", "rbxassetid://16867772594", "Set") :: PluginToolbarButton
+local SetBlueprint = Toolbar:CreateButton("Blueprint Main", "Open a Script Blueprint", "rbxassetid://16867772594", "Open Blueprint") :: PluginToolbarButton
+
+local PluginMenu = plugin:CreatePluginMenu("Blueprint Selection Menu", "Blueprint Selection Menu")
+PluginMenu:AddNewAction("Blueprint Script", "Script", "rbxasset://textures/StudioToolbox/script.png")
+PluginMenu:AddNewAction("Blueprint LocalScript", "LocalScript", "rbxasset://textures/StudioToolbox/script.png") -- TODO: Replace these with their actual icons...
+PluginMenu:AddNewAction("Blueprint ModuleScript", "ModuleScript", "rbxasset://textures/StudioToolbox/script.png")
+
 
 ----- Private Methods -----
 local function IsNewScript(Script: Script, Source: string): boolean
 	if Script:IsA("LocalScript") or Script:IsA("Script") then
-		if Source == 'print("Hello world!")\n' then
+		if Source == DEFAULT_SCRIPT_SOURCE then
 			return true
 		end
 	elseif Script:IsA("ModuleScript") then
-		if Source == 'local module = {}\n\nreturn module\n' then 
+		if Source == DEFAULT_MODULE_SOURCE then 
 			return true
 		end
 	end
-
+	
 	return false
 end
 
-local function ReplaceBlueprintSource()
-	local Selected = Selection:Get()
-	if #Selected < 1 then
-		error(`Blueprint: Select a "Script" as source input`)
+local function CreateScript(Source: string, ScriptType: ScriptType): Script?
+	local Script = Instance.new(ScriptType)
+	Script.Parent = workspace
+
+	ScriptEditorService:UpdateSourceAsync(Script, function()
+		return Source
+	end)
+
+	local Success, _ = ScriptEditorService:OpenScriptDocumentAsync(Script)
+	if not Success then
+		Script:Destroy()
+		return
 	end
+
+	return Script
+end
+
+local function ReplaceBlueprintSource(ScriptType: ScriptType, ScriptSource: string)
+	if not ScriptType then return end
+	if not ScriptSource then return end
 	
-	local Script = Selected[1] :: Script
-	if not Script or (not Script:IsA("Script") and not Script:IsA("ModuleScript") and not Script:IsA("LocalScript")) then 
-		error(`Blueprint: Select a "Script" object as source input`)
-	end
-	
-	local ScriptSource = Script.Source
-	if not ScriptSource then
-		error(`Blueprint: Invalid script source`)
-	end
-	
-	plugin:SetSetting(`{Script.ClassName}-BlueprintSource`, ScriptSource)
-	print(`Blueprint: Successfully set {Script.ClassName} blueprint source as ->`, {ScriptSource})
+	plugin:SetSetting(`{ScriptType}-BlueprintSource`, ScriptSource)
+	print(`Blueprint: Successfully set {ScriptType} blueprint source as ->`, {ScriptSource})
 end
 
 local function ReplaceSource(ScriptDocument)
@@ -110,5 +128,46 @@ ScriptEditorService.TextDocumentDidOpen:Connect(function(ScriptDocument)
 end)
 
 SetBlueprint.Click:Connect(function()
-	ReplaceBlueprintSource()
+	task.defer(function()
+		SetBlueprint:SetActive(false)
+	end)
+	
+	local Selected = PluginMenu:ShowAsync()
+	if not Selected then return end
+	
+	local ScriptDocument = CreateScript(plugin:GetSetting(`{Selected.Text}-BlueprintSource`), Selected.Text)
+	if not ScriptDocument then return end
+	
+	ScriptDocument.Name = `{string.upper(Selected.Text)} BLUEPRINT (TEMPORARY INSTANCE)`
+	
+	local CloseConnection
+	CloseConnection = ScriptEditorService.TextDocumentDidClose:Connect(function(ClosedScript)
+		if ScriptDocument.Parent == nil then -- incase blueprint instance gets destroyed???
+			CloseConnection:Disconnect()
+			return
+		end
+		
+		if ClosedScript:GetScript() ~= ScriptDocument then
+			return
+		end
+		
+		CloseConnection:Disconnect()
+		
+		local ScriptSource = ScriptDocument.Source
+		ScriptDocument:Destroy()
+		
+		ReplaceBlueprintSource(Selected.Text, ScriptSource)
+	end)
 end)
+
+----- Initialize -----
+local function InitializeBlueprint(ScriptType: ScriptType, ScriptSource: string)
+	local SavedSource = plugin:GetSetting(`{ScriptType}-BlueprintSource`)
+	if SavedSource then return end
+	
+	plugin:SetSetting(`{ScriptType}-BlueprintSource`, ScriptSource)
+end
+
+InitializeBlueprint("Script", DEFAULT_SCRIPT_SOURCE)
+InitializeBlueprint("LocalScript", DEFAULT_SCRIPT_SOURCE)
+InitializeBlueprint("ModuleScript", DEFAULT_MODULE_SOURCE)

@@ -20,8 +20,9 @@ _The Creator Marketplace is the easiest way to install Blueprint. You'll get acc
 2. Drag and Drop the plugin file into the Roblox Studio "Plugins Folder" _(TopBar -> Plugins -> Plugins Folder)_
 
 ## Usage
-1. Select a "Script" Instance in the Roblox Studio "Explorer" with the desired source template
-2. From the Studio TopBar go to "Plugins" -> "Blueprint" Toolbar -> "Set" Button
+1. From the Studio TopBar go to "Plugins" -> "Blueprint" Toolbar -> "Open Blueprint" Button -> Select Script Type from the dropdown menu
+2. Modify the created blueprint script
+3. Close the blueprint script tab to save!
 
 Now, create a new script instance to witness the source get changed!
 
