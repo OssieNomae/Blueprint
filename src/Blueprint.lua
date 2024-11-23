@@ -1,7 +1,7 @@
 --!strict
 --[[
 	License: Licensed under the MIT License
-	Version: 1.2.0
+	Version: 1.2.1
 	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
