@@ -147,7 +147,7 @@ SetBlueprint.Click:Connect(function()
 			return
 		end
 		
-		if ClosedScript:GetScript() ~= ScriptDocument then
+		if ClosedScript:GetFullName() ~= ScriptDocument:GetFullName() then -- :GetScript() breaks in team create???
 			return
 		end
 		
