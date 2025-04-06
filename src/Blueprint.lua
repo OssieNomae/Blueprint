@@ -1,7 +1,7 @@
 --!strict
 --[[
 	License: Licensed under the MIT License
-	Version: 1.2.1
+	Version: 1.2.2
 	Github: https://github.com/OssieNomae/Blueprint
 	Authors:
 		OssieNomae - 2024
@@ -133,7 +133,7 @@ SetBlueprint.Click:Connect(function()
 		SetBlueprint:SetActive(false)
 	end)
 	
-	local Selected = PluginMenu:ShowAsync()
+	local Selected = PluginMenu:ShowAsync() :: PluginAction & {Text: ScriptType}
 	if not Selected then return end
 	
 	local ScriptDocument = CreateScript(plugin:GetSetting(`{Selected.Text}-BlueprintSource`), Selected.Text)
@@ -148,7 +148,7 @@ SetBlueprint.Click:Connect(function()
 			return
 		end
 		
-		if ClosedScript:GetFullName() ~= ScriptDocument:GetFullName() then -- :GetScript() breaks in team create???
+		if not string.find(ClosedScript:GetFullName(), ScriptDocument:GetFullName(), 1, true) then -- :GetScript() breaks in team create???
 			return
 		end
 		
