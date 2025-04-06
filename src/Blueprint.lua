@@ -21,6 +21,7 @@ local DEFAULT_MODULE_SOURCE = 'local module = {}\n\nreturn module\n'
 ----- Loaded Services -----
 local Selection = game:GetService("Selection")
 local ScriptEditorService = game:GetService("ScriptEditorService")
+local StudioService = game:GetService("StudioService")
 
 ----- Types -----
 type ScriptType = "Script" | "LocalScript" | "ModuleScript"
@@ -30,9 +31,9 @@ local Toolbar = plugin:CreateToolbar("Blueprint") :: PluginToolbar
 local SetBlueprint = Toolbar:CreateButton("Blueprint Main", "Open a Script Blueprint", "rbxassetid://16867772594", "Open Blueprint") :: PluginToolbarButton
 
 local PluginMenu = plugin:CreatePluginMenu("Blueprint Selection Menu", "Blueprint Selection Menu")
-PluginMenu:AddNewAction("Blueprint Script", "Script", "rbxasset://textures/StudioToolbox/script.png")
-PluginMenu:AddNewAction("Blueprint LocalScript", "LocalScript", "rbxasset://textures/StudioToolbox/script.png") -- TODO: Replace these with their actual icons...
-PluginMenu:AddNewAction("Blueprint ModuleScript", "ModuleScript", "rbxasset://textures/StudioToolbox/script.png")
+PluginMenu:AddNewAction("Blueprint Script", "Script", StudioService:GetClassIcon("Script").Image)
+PluginMenu:AddNewAction("Blueprint LocalScript", "LocalScript", StudioService:GetClassIcon("LocalScript").Image)
+PluginMenu:AddNewAction("Blueprint ModuleScript", "ModuleScript", StudioService:GetClassIcon("ModuleScript").Image)
 
 
 ----- Private Methods -----
